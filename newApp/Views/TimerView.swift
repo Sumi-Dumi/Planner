@@ -11,11 +11,11 @@ struct TimerView: View {
     @State private var minutes: Int = 30
 
     @State private var timeRemaining: Int = 0
+    @State private var totalTime: Int = 0
     @State private var timerRunning = false
     @State private var timer: AnyCancellable?
 
     @State private var sessionStartTime: Date?
-
 
     @State private var showFocusPopup = false
     @State private var lastSessionID: UUID?
@@ -24,7 +24,6 @@ struct TimerView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 20) {
-                // 드롭다운
                 Button(action: {
                     isDropdownExpanded.toggle()
                 }) {
@@ -61,7 +60,6 @@ struct TimerView: View {
                 )
                 .padding(.horizontal)
 
-                // 시간 선택 피커
                 HStack {
                     Picker("", selection: $hours) {
                         ForEach(0..<6) { Text("\($0) h") }
@@ -76,11 +74,11 @@ struct TimerView: View {
                     .clipped()
                 }
                 .pickerStyle(WheelPickerStyle())
+                .disabled(timerRunning || timeRemaining > 0)
 
                 Text(timeString(from: timeRemaining))
                     .font(.system(size: 48, weight: .bold, design: .monospaced))
 
-                // 버튼
                 HStack(spacing: 20) {
                     if !timerRunning {
                         Button("Start") {
@@ -105,7 +103,6 @@ struct TimerView: View {
             .padding()
             .onAppear(perform: loadTasks)
 
-            // 드롭다운 리스트
             if isDropdownExpanded {
                 VStack(spacing: 8) {
                     ForEach(tasks, id: \.id) { task in
@@ -134,7 +131,6 @@ struct TimerView: View {
                 .position(x: dropdownFrame.midX, y: dropdownFrame.maxY + 62)
             }
 
-            // ⭐️ 포커스 레이팅 팝업
             if showFocusPopup {
                 Color.black.opacity(0.3).ignoresSafeArea()
                 FocusPopupView(rating: $focusRating, onRate: {
@@ -151,8 +147,12 @@ struct TimerView: View {
 
     func startTimer() {
         guard let task = selectedTask else { return }
-        let totalSeconds = (hours * 60 + minutes) * 60
-        timeRemaining = totalSeconds
+
+        if timeRemaining == 0 {
+            totalTime = (hours * 60 + minutes) * 60
+            timeRemaining = totalTime
+        }
+
         sessionStartTime = Date()
         timerRunning = true
 
@@ -190,6 +190,7 @@ struct TimerView: View {
         timerRunning = false
         sessionStartTime = nil
         timeRemaining = 0
+        totalTime = 0
     }
 
     func saveSession(task: TaskItem, start: Date, end: Date) -> UUID {
@@ -257,6 +258,7 @@ struct TimerView: View {
         return String(format: "%02d:%02d:%02d", h, m, s)
     }
 }
+
 
 #Preview {
     TimerView()
