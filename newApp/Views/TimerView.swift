@@ -20,6 +20,8 @@ struct TimerView: View {
     @State private var showFocusPopup = false
     @State private var lastSessionID: UUID?
     @State private var focusRating: Int = 0
+    
+    @State private var showErrorPopup = false
 
     var body: some View {
         ZStack {
@@ -85,6 +87,13 @@ struct TimerView: View {
                             startTimer()
                         }
                         .font(.title2)
+                        .alert(isPresented: $showErrorPopup) {
+                        Alert(
+                            title: Text("No Task Selected"),
+                            message: Text("Please select a task before starting the timer."),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }
                     } else {
                         Button("Pause") {
                             pauseTimer()
@@ -142,11 +151,16 @@ struct TimerView: View {
                 .cornerRadius(16)
                 .shadow(radius: 6)
             }
+            
+
         }
     }
 
     func startTimer() {
-        guard let task = selectedTask else { return }
+        guard let selectedTask = selectedTask else {
+            showErrorPopup = true
+            return
+        }
 
         if timeRemaining == 0 {
             totalTime = (hours * 60 + minutes) * 60
