@@ -14,6 +14,7 @@ struct TimerView: View {
     @State private var totalTime: Int = 0
     @State private var timerRunning = false
     @State private var timer: AnyCancellable?
+    @State private var onPause: Bool = false
 
     @State private var sessionStartTime: Date?
 
@@ -22,6 +23,7 @@ struct TimerView: View {
     @State private var focusRating: Int = 0
     
     @State private var showErrorPopup = false
+
 
     var body: some View {
         ZStack {
@@ -83,8 +85,15 @@ struct TimerView: View {
 
                 HStack(spacing: 20) {
                     if !timerRunning {
-                        Button("Start") {
+                        Button {
                             startTimer()
+                        } label: {
+                            if !onPause {
+                                Text("Start")
+                            } else {
+                                Text("Continue")
+                            }
+                            
                         }
                         .font(.title2)
                         .alert(isPresented: $showErrorPopup) {
@@ -97,11 +106,13 @@ struct TimerView: View {
                     } else {
                         Button("Pause") {
                             pauseTimer()
+                            onPause.toggle()
                         }
                         .font(.title2)
 
                         Button("Stop") {
                             stopTimer()
+                            onPause.toggle()
                         }
                         .font(.title2)
                     }
