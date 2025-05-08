@@ -4,7 +4,7 @@ struct NavBarView: View {
     @Binding var selectedTab: Tab
 
     enum Tab {
-        case home, timer, graph, calendar
+        case home, task, timer, graph, calendar
     }
 
     var body: some View {
@@ -12,12 +12,15 @@ struct NavBarView: View {
             Spacer()
             navButton(imageName: "house.fill", tab: .home)
             Spacer()
+            navButton(imageName: "list.bullet", tab: .task)
+            Spacer()
             navButton(imageName: "clock.fill", tab: .timer)
             Spacer()
             navButton(imageName: "chart.line.uptrend.xyaxis", tab: .graph)
             Spacer()
             navButton(imageName: "calendar", tab: .calendar)
             Spacer()
+            
         }
         .padding(.vertical, 10)
         .background(Color.white.shadow(radius: 2))

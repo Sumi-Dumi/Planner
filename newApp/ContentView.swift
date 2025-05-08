@@ -9,6 +9,8 @@ struct ContentView: View {
                 switch selectedTab {
                 case .home:
                     MainView()
+                case .task:
+                    TaskView()
                 case .timer:
                     TimerView()
                 case .graph:
