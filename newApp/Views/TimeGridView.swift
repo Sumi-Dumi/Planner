@@ -4,6 +4,8 @@ struct TimeGridView: View {
     @Binding var currentDate: Date
     @State private var editingDate: Date
 
+    @Environment(\.dismiss) var dismiss
+
     @State private var tasks: [TaskItem] = []
     @State private var selectedTask: TaskItem? = nil
     @State private var isDropdownExpanded: Bool = false
@@ -28,17 +30,32 @@ struct TimeGridView: View {
         ZStack(alignment: .topLeading) {
             VStack(spacing: 12) {
                 HStack {
+                    Button(action: {
+                        currentDate = Date()
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .foregroundColor(.red)
+                            .font(.title2)
+                    }
+
+                    Spacer()
+
                     Button(action: { changeDate(by: -1) }) {
                         Image(systemName: "chevron.left").font(.title2)
                     }
+
                     Spacer()
                     Text(formattedDate)
                         .font(.title3)
                         .foregroundColor(.blue)
                     Spacer()
+
                     Button(action: { changeDate(by: 1) }) {
                         Image(systemName: "chevron.right").font(.title2)
                     }
+
+                    Spacer()
                 }
                 .padding(.horizontal)
 
@@ -185,7 +202,6 @@ struct TimeGridView: View {
         .onChange(of: editingDate) {
             loadSavedData(for: editingDate)
         }
-
         .navigationBarBackButtonHidden(true)
     }
 
