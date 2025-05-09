@@ -87,6 +87,7 @@ struct TimerView: View {
                     if !timerRunning {
                         Button {
                             startTimer()
+                            onPause = false
                         } label: {
                             if !onPause {
                                 Text("Start")
@@ -106,13 +107,13 @@ struct TimerView: View {
                     } else {
                         Button("Pause") {
                             pauseTimer()
-                            onPause.toggle()
+                            onPause = true
                         }
                         .font(.title2)
 
                         Button("Stop") {
                             stopTimer()
-                            onPause.toggle()
+                            onPause = false
                         }
                         .font(.title2)
                     }
