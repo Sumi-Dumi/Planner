@@ -97,50 +97,56 @@ struct GraphView: View {
 
                     }.padding(.horizontal)
                 }
-
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Text("Breakdown")
-                            .font(.title)
-                            .padding(.top)
-
-                    }.padding(.horizontal)
-                    // VStack의 alignment를 .leading으로 변경
-                    ForEach(achievementRates, id: \.task.id) { item in
-                        VStack(alignment: .leading) {
+                
+                    VStack(alignment: .leading, spacing: 10) {
+                        
+                        if !achievementRates.isEmpty {
                             HStack {
-                                Text(item.task.name)
-                                    .font(.title2)
+                                Text("Breakdown")
+                                    .font(.title)
                                     .padding(.top)
-
+                                
                             }.padding(.horizontal)
-                            HStack {
-                                Text("Achieved Time")
-                                Spacer()
-                                Text("\(formatTimeInterval(item.achievedTime))")
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(.horizontal)
-                            HStack {
-                                Text("Planned Time")
-                                Spacer()
-                                Text("\(formatTimeInterval(item.plannedTime))")
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(.horizontal)
-                            HStack {
-                                Text("Achievement Rate")
-                                    .font(.headline)
-                                Spacer()
-                                Text(String(format: "%.1f%%", item.rate * 100))
-                                    .font(.headline)
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(.horizontal)
                         }
 
+                        // VStack의 alignment를 .leading으로 변경
+                        ScrollView {
+                        ForEach(achievementRates, id: \.task.id) { item in
+                            VStack(alignment: .leading) {
+                                HStack {
+                                    Text(item.task.name)
+                                        .font(.title2)
+                                        .padding(.top)
+                                    
+                                }.padding(.horizontal)
+                                HStack {
+                                    Text("Achieved Time")
+                                    Spacer()
+                                    Text("\(formatTimeInterval(item.achievedTime))")
+                                        .foregroundColor(.blue)
+                                }
+                                .padding(.horizontal)
+                                HStack {
+                                    Text("Planned Time")
+                                    Spacer()
+                                    Text("\(formatTimeInterval(item.plannedTime))")
+                                        .foregroundColor(.blue)
+                                }
+                                .padding(.horizontal)
+                                HStack {
+                                    Text("Achievement Rate")
+                                        .font(.headline)
+                                    Spacer()
+                                    Text(String(format: "%.1f%%", item.rate * 100))
+                                        .font(.headline)
+                                        .foregroundColor(.blue)
+                                }
+                                .padding(.horizontal)
+                            }
+                            
+                        }
+                        
                     }
-
                 }
                 Spacer()
 
