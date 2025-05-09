@@ -46,9 +46,14 @@ struct TimeGridView: View {
                     }
 
                     Spacer()
-                    Text(formattedDate)
-                        .font(.title3)
-                        .foregroundColor(.blue)
+
+                    DatePicker(
+                        "",
+                        selection: $currentDate,
+                        displayedComponents: [.date]
+                    )
+                    .labelsHidden()
+
                     Spacer()
 
                     Button(action: { changeDate(by: 1) }) {
@@ -73,10 +78,18 @@ struct TimeGridView: View {
                                 Circle()
                                     .fill(task.color)
                                     .frame(width: 24, height: 24)
-                                    .overlay(Circle().stroke(Color.black, lineWidth: 1))
+                                    .overlay(
+                                        Circle().stroke(
+                                            Color.black,
+                                            lineWidth: 1
+                                        )
+                                    )
                             }
-                            Image(systemName: isDropdownExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.black)
+                            Image(
+                                systemName: isDropdownExpanded
+                                    ? "chevron.up" : "chevron.down"
+                            )
+                            .foregroundColor(.black)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -85,13 +98,15 @@ struct TimeGridView: View {
                                 Color.clear
                                     .onAppear {
                                         DispatchQueue.main.async {
-                                            dropdownOrigin = geo.frame(in: .global).origin
+                                            dropdownOrigin =
+                                                geo.frame(in: .global).origin
                                             dropdownWidth = geo.size.width
                                         }
                                     }
                                     .onChange(of: isDropdownExpanded) {
                                         DispatchQueue.main.async {
-                                            dropdownOrigin = geo.frame(in: .global).origin
+                                            dropdownOrigin =
+                                                geo.frame(in: .global).origin
                                             dropdownWidth = geo.size.width
                                         }
                                     }
@@ -113,26 +128,46 @@ struct TimeGridView: View {
                             ForEach(hours.indices, id: \.self) { rowIndex in
                                 HStack(spacing: 0) {
                                     Text("\(hours[rowIndex])")
-                                        .frame(width: hourLabelWidth, height: cellHeight)
+                                        .frame(
+                                            width: hourLabelWidth,
+                                            height: cellHeight
+                                        )
                                         .font(.system(size: 12))
                                         .foregroundColor(.gray)
-                                        .border(Color.gray.opacity(0.3), width: 1)
+                                        .border(
+                                            Color.gray.opacity(0.3),
+                                            width: 1
+                                        )
 
                                     ZStack(alignment: .topLeading) {
                                         HStack(spacing: 0) {
                                             ForEach(0..<6, id: \.self) { _ in
                                                 Rectangle()
-                                                    .strokeBorder(Color.gray.opacity(0.3), lineWidth: 1)
-                                                    .frame(width: cellWidth, height: cellHeight)
+                                                    .strokeBorder(
+                                                        Color.gray.opacity(0.3),
+                                                        lineWidth: 1
+                                                    )
+                                                    .frame(
+                                                        width: cellWidth,
+                                                        height: cellHeight
+                                                    )
                                             }
                                         }
 
-                                        ForEach(barSpansForRow(rowIndex)) { span in
+                                        ForEach(barSpansForRow(rowIndex)) {
+                                            span in
                                             RoundedRectangle(cornerRadius: 6)
-                                                .fill(span.task.color.opacity(0.5))
-                                                .frame(width: CGFloat(span.span) * cellWidth - 4, height: 16)
+                                                .fill(
+                                                    span.task.color.opacity(0.5)
+                                                )
+                                                .frame(
+                                                    width: CGFloat(span.span)
+                                                        * cellWidth - 4,
+                                                    height: 16
+                                                )
                                                 .offset(
-                                                    x: CGFloat(span.startCol) * cellWidth + 2,
+                                                    x: CGFloat(span.startCol)
+                                                        * cellWidth + 2,
                                                     y: (cellHeight - 16) / 2
                                                 )
                                         }
@@ -166,6 +201,7 @@ struct TimeGridView: View {
             .padding(.horizontal)
 
             if isDropdownExpanded {
+
                 VStack(spacing: 8) {
                     ForEach(tasks, id: \.id) { task in
                         Button(action: {
@@ -178,7 +214,12 @@ struct TimeGridView: View {
                                 Circle()
                                     .fill(task.color)
                                     .frame(width: 24, height: 24)
-                                    .overlay(Circle().stroke(Color.black, lineWidth: 1))
+                                    .overlay(
+                                        Circle().stroke(
+                                            Color.black,
+                                            lineWidth: 1
+                                        )
+                                    )
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
@@ -218,7 +259,11 @@ struct TimeGridView: View {
     }
 
     func changeDate(by days: Int) {
-        if let newDate = Calendar.current.date(byAdding: .day, value: days, to: editingDate) {
+        if let newDate = Calendar.current.date(
+            byAdding: .day,
+            value: days,
+            to: editingDate
+        ) {
             editingDate = newDate
         }
     }
@@ -236,7 +281,11 @@ struct TimeGridView: View {
 
     func loadSavedData(for date: Date) {
         if let data = UserDefaults.standard.data(forKey: "SavedGridData"),
-           let decoded = try? JSONDecoder().decode([String: [CellCoord: TaskItem]].self, from: data) {
+            let decoded = try? JSONDecoder().decode(
+                [String: [CellCoord: TaskItem]].self,
+                from: data
+            )
+        {
             savedData = decoded
             let key = {
                 let f = DateFormatter()
@@ -249,7 +298,11 @@ struct TimeGridView: View {
 
     func loadTasks() {
         if let saved = UserDefaults.standard.data(forKey: "SavedTasks"),
-           let decoded = try? JSONDecoder().decode([TaskItem].self, from: saved) {
+            let decoded = try? JSONDecoder().decode(
+                [TaskItem].self,
+                from: saved
+            )
+        {
             tasks = decoded
         }
     }
@@ -265,11 +318,15 @@ struct TimeGridView: View {
             }
 
             var span = 1
-            while col + span < 6, filledCells[CellCoord(row: row, col: col + span)] == task {
+            while col + span < 6,
+                filledCells[CellCoord(row: row, col: col + span)] == task
+            {
                 span += 1
             }
 
-            spans.append(BarSpan(row: row, startCol: col, span: span, task: task))
+            spans.append(
+                BarSpan(row: row, startCol: col, span: span, task: task)
+            )
             col += span
         }
         return spans

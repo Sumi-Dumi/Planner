@@ -24,9 +24,11 @@ struct MainView: View {
                             Image(systemName: "chevron.left").font(.title2)
                         }
                         Spacer()
-                        Text(formattedDate)
-                            .font(.title3)
-                            .foregroundColor(.blue)
+                        DatePicker(
+                            "Date",
+                            selection: $currentDate,
+                            displayedComponents: [.date]
+                        ).labelsHidden()
                         Spacer()
                         Button(action: { changeDate(by: 1) }) {
                             Image(systemName: "chevron.right").font(.title2)
