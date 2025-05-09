@@ -112,8 +112,8 @@ struct MainView: View {
                     }
 
                     HStack(spacing: 40) {
-                        ToggleCircle(label: "Plan", isOn: $showPlan)
-                        ToggleCircle(label: "Achieve", isOn: $showAchieve)
+                        ToggleCircle(label: "Planned", isOn: $showPlan)
+                        ToggleCircle(label: "Achieved", isOn: $showAchieve)
                     }
                     .padding(.bottom)
 
@@ -162,8 +162,8 @@ struct MainView: View {
                             }
                         }
                     }
-                    .frame(width: dropdownFrame.width)
                     .padding()
+                    .frame(width: dropdownFrame.width)
                     .background(Color.white)
                     .cornerRadius(12)
                     .shadow(radius: 4)

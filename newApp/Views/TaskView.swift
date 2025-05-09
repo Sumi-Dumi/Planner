@@ -23,7 +23,7 @@ struct TaskView: View {
                         .font(.title2)
                         .foregroundColor(.blue)
 
-                    TextField("type your task", text: $newTaskName)
+                    TextField("Enter task name", text: $newTaskName)
                         .padding(6)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
