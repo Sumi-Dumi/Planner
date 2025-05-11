@@ -71,13 +71,19 @@ struct TaskView: View {
                                 Text(task.name)
                                     .font(.title3)
                                     .foregroundColor(.blue)
-                                    .onTapGesture {
-                                        editingTaskID = task.id
-                                        editingName = task.name
-                                    }
                             }
 
                             Spacer()
+
+                            // ペンシルアイコンを追加
+                            Button {
+                                editingTaskID = task.id
+                                editingName = task.name
+                            } label: {
+                                Image(systemName: "pencil")
+                                    .foregroundColor(.blue)
+                            }
+                            .padding(.trailing, 8)
 
                             Button {
                                 if colorPickerTaskID == task.id {
@@ -99,14 +105,41 @@ struct TaskView: View {
                                     saveEditedTask(task.id)
                                 }
                                 .foregroundColor(.blue)
+                                .padding(6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.blue, lineWidth: 1)
+                                )
 
                                 Button("Delete") {
                                     deleteTask(task.id)
                                 }
                                 .foregroundColor(.red)
+                                .padding(6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.red, lineWidth: 1)
+                                )
+
+                                Button("Cancel") {
+                                    editingTaskID = nil
+                                }
+                                .foregroundColor(.gray)
+                                .padding(6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.gray, lineWidth: 1)
+                                )
                             }
+                            .padding(.top, 4)
                         }
                     }
+                    .padding(.vertical, 4)
+                    .padding(.horizontal, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.gray.opacity(0.05))
+                    )
                 }
 
                 Spacer()
@@ -132,27 +165,46 @@ struct TaskView: View {
                     .cornerRadius(12)
                     .shadow(radius: 4)
                     .padding()
+
+                    Button("完了") {
+                        colorPickerTaskID = nil
+                    }
+                    .foregroundColor(.blue)
+                    .padding(8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color.blue.opacity(0.1))
+                    )
+                    .padding(.bottom)
                 }
             }
         }
         .onTapGesture {
-            colorPickerTaskID = nil
+            // タップ時はカラーピッカーだけ閉じる（編集モードは維持）
+            if colorPickerTaskID != nil {
+                colorPickerTaskID = nil
+            }
         }
         .onAppear(perform: loadTasks)
     }
 
     private func colorGrid(for colorBinding: Binding<Color>) -> some View {
-        LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 12), count: 5), spacing: 12) {
-            ForEach(colorOptions, id: \.self) { color in
-                Circle()
-                    .fill(color)
-                    .frame(width: 32, height: 32)
-                    .overlay(Circle().stroke(Color.black.opacity(colorBinding.wrappedValue == color ? 1 : 0), lineWidth: 2))
-                    .onTapGesture {
-                        colorBinding.wrappedValue = color
-                        showColorPicker = false
-                        colorPickerTaskID = nil
-                    }
+        VStack(spacing: 8) {
+            Text("色を選択")
+                .font(.headline)
+                .padding(.top, 4)
+
+            LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 12), count: 5), spacing: 12) {
+                ForEach(colorOptions, id: \.self) { color in
+                    Circle()
+                        .fill(color)
+                        .frame(width: 32, height: 32)
+                        .overlay(Circle().stroke(Color.black.opacity(colorBinding.wrappedValue == color ? 1 : 0), lineWidth: 2))
+                        .onTapGesture {
+                            colorBinding.wrappedValue = color
+                            showColorPicker = false
+                        }
+                }
             }
         }
     }
@@ -189,4 +241,3 @@ struct TaskView: View {
 #Preview {
     TaskView()
 }
-
