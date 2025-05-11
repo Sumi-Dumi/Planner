@@ -2,7 +2,7 @@ import SwiftUI
 
 struct TimeGridView: View {
     @Binding var currentDate: Date
-    @State private var editingDate: Date
+    //    @State private var editingDate: Date
 
     @Environment(\.dismiss) var dismiss
 
@@ -18,12 +18,11 @@ struct TimeGridView: View {
 
     let hours = (4..<24).map { "\($0)" } + (0..<4).map { "\($0)" }
     let cellWidth: CGFloat = 56
-    let cellHeight: CGFloat = 28
-    let hourLabelWidth: CGFloat = 40
+    let cellHeight: CGFloat = 26
+    let hourLabelWidth: CGFloat = 30
 
     init(currentDate: Binding<Date>) {
         self._currentDate = currentDate
-        self._editingDate = State(initialValue: currentDate.wrappedValue)
     }
 
     var body: some View {
@@ -31,7 +30,6 @@ struct TimeGridView: View {
             VStack(spacing: 12) {
                 HStack {
                     Button(action: {
-                        currentDate = Date()
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
@@ -113,7 +111,6 @@ struct TimeGridView: View {
 
                             }
                         )
-                        .frame(width: 296)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color.blue.opacity(0.5), lineWidth: 2)
@@ -121,7 +118,6 @@ struct TimeGridView: View {
                     }
                 }
                 .padding(.horizontal)
-
                 GeometryReader { _ in
                     ScrollView {
                         VStack(spacing: 0) {
@@ -190,13 +186,6 @@ struct TimeGridView: View {
                 }
                 .frame(maxHeight: .infinity)
 
-                Button("Save") {
-                    saveCurrentGrid()
-                }
-                .padding(2)
-                .frame(maxWidth: 150)
-                .background(Color.blue.opacity(0.2))
-                .cornerRadius(10)
             }
             .padding(.horizontal)
 
@@ -238,10 +227,17 @@ struct TimeGridView: View {
         }
         .onAppear {
             loadTasks()
-            loadSavedData(for: editingDate)
+            if tasks.count != 0 {
+                selectedTask = tasks[0]
+            }
+            loadSavedData(for: currentDate)
         }
-        .onChange(of: editingDate) {
-            loadSavedData(for: editingDate)
+        .onChange(of: filledCells) {
+            saveCurrentGrid()
+        }
+        .onChange(of: currentDate) {
+
+            loadSavedData(for: currentDate)
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -249,22 +245,22 @@ struct TimeGridView: View {
     var formattedDate: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .short
-        return formatter.string(from: editingDate)
+        return formatter.string(from: currentDate)
     }
 
     var currentDateKey: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: editingDate)
+        return formatter.string(from: currentDate)
     }
 
     func changeDate(by days: Int) {
         if let newDate = Calendar.current.date(
             byAdding: .day,
             value: days,
-            to: editingDate
+            to: currentDate
         ) {
-            editingDate = newDate
+            currentDate = newDate
         }
     }
 

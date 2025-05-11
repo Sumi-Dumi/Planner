@@ -9,6 +9,11 @@ struct MainView: View {
 
     @State private var showPlan: Bool = true
     @State private var showAchieve: Bool = true
+    
+    @State private var showErrorPopup = false
+    
+    @State private var navigationPath: [String] = []
+    
 
     let hours = (4..<24).map { "\($0)" } + (0..<4).map { "\($0)" }
     let hourLabelWidth: CGFloat = 40
@@ -16,7 +21,7 @@ struct MainView: View {
     let cellHeight: CGFloat = 28
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationPath) {
             ZStack(alignment: .topLeading) {
                 VStack(spacing: 12) {
                     HStack {
@@ -109,7 +114,6 @@ struct MainView: View {
                                 }
                             }
 
-                            Spacer().frame(height: 60)
                         }
                     }
 
@@ -117,17 +121,43 @@ struct MainView: View {
                         ToggleCircle(label: "Planned", isOn: $showPlan)
                         ToggleCircle(label: "Achieved", isOn: $showAchieve)
                     }
-                    .padding(.bottom)
-
-                    NavigationLink(destination: TimeGridView(currentDate: $currentDate)) {
-                        Text("EDIT")
-                            .font(.title2)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue.opacity(0.1))
-                            .cornerRadius(10)
-                    }
-                    .padding(.horizontal)
+                    .padding(.top)
+                    
+                    
+                        Button {
+                            if tasks.isEmpty {
+                                showErrorPopup = true
+                            } else {
+                                navigationPath.append("timeGridView")
+                            }
+                            
+                        } label: {
+                            Text("Plan")
+                                .font(.title2)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(10)
+                        }
+                        .font(.title2)
+                        .padding()
+                        .alert(isPresented: $showErrorPopup) {
+                            Alert(
+                                title: Text("No Task Available"),
+                                message: Text("Please create a task first."),
+                                dismissButton: .default(Text("OK"))
+                            )
+                        }
+                            
+//                    NavigationLink(destination: TimeGridView(currentDate: $currentDate)) {
+//                        Text("Plan")
+//                            .font(.title2)
+//                            .frame(maxWidth: .infinity)
+//                            .padding()
+//                            .background(Color.blue.opacity(0.1))
+//                            .cornerRadius(10)
+//                    }
+//                    .padding()
                 }
 
                 if isDropdownExpanded {
@@ -175,7 +205,13 @@ struct MainView: View {
             .onAppear {
                 loadTasks()
             }
+            .navigationDestination(for: String.self) { valueInPath in
+                if valueInPath == "timeGridView" {
+                    TimeGridView(currentDate: $currentDate)
+                }
+            }
         }
+
     }
 
     var formattedDate: String {
