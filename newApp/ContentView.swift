@@ -18,14 +18,9 @@ struct ContentView: View {
                     Label("Timer", systemImage: "clock.fill")
                 }
 
-            GraphView()
-                .tabItem {
-                    Label("Graph", systemImage: "chart.bar.fill")
-                }
-
             CalendarView()
                 .tabItem {
-                    Label("Calendar", systemImage: "calendar")
+                    Label("Graph", systemImage: "chart.bar.fill")
                 }
         }
     }
