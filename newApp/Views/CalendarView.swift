@@ -9,105 +9,108 @@ struct CalendarView: View {
     private let dayOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
     var body: some View {
-        ZStack {
-            Color(hex: "#b99a88").edgesIgnoringSafeArea(.all)
-
-            VStack {
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.white)
-            .cornerRadius(20)
-            .padding(.top, 10)
-            .padding(.bottom, 10)
-            .padding(.horizontal, 10)
-
-            VStack(spacing: 16) {
-                Spacer().frame(height: 16)
-
-                HStack(spacing: 16) {
-                    Spacer()
-                    Button(action: { changeMonth(by: -1) }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(hex: "#d5bca6"))
-                                .frame(width: 32, height: 32)
-                            Image(systemName: "chevron.left")
-                                .foregroundColor(.white)
-                        }
-                    }
-                    Text(formattedMonth)
-                        .font(.title3)
-                        .foregroundColor(Color(hex: "#333333"))
-                    Button(action: { changeMonth(by: 1) }) {
-                        ZStack {
-                            Circle()
-                                .fill(Color(hex: "#d5bca6"))
-                                .frame(width: 32, height: 32)
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.white)
-                        }
-                    }
+        NavigationStack{
+            ZStack {
+                
+                Color(hex: "#b99a88").edgesIgnoringSafeArea(.all)
+                
+                VStack {
                     Spacer()
                 }
-                .padding(.horizontal, 24)
-
-                HStack(spacing: 0) {
-                    ForEach(dayOfWeek, id: \.self) { day in
-                        Text(day)
-                            .frame(maxWidth: .infinity)
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                }
-                .padding(.horizontal, 24)
-
-                GeometryReader { geometry in
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
-                        ForEach(daysInMonth, id: \.self) { date in
-                            if let date = date {
-                                let dateString = dateToString(date)
-                                let rate = dailyDataForCurrentMonth[dateString] ?? 0.0
-
-                                NavigationLink(destination: GraphView(currentDate: date)) {
-                                    VStack {
-                                        Text("\(calendar.component(.day, from: date))")
-                                            .font(isToday(date) ? .system(size: 16, weight: .bold) : .system(size: 16))
-                                            .foregroundColor(isToday(date) ? .blue : Color(hex: "#333333"))
-                                            .padding(.top, 4)
-                                            .frame(width: 25)
-                                        Spacer()
-                                    }
-                                    .padding(10)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(getColor(rate: rate))
-                                    )
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            } else {
-                                Rectangle().fill(Color.clear)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+                .cornerRadius(20)
+                .padding(.top, 10)
+                .padding(.bottom, 10)
+                .padding(.horizontal, 10)
+                
+                VStack(spacing: 16) {
+                    Spacer().frame(height: 16)
+                    
+                    HStack(spacing: 16) {
+                        Spacer()
+                        Button(action: { changeMonth(by: -1) }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#d5bca6"))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.white)
                             }
+                        }
+                        Text(formattedMonth)
+                            .font(.title3)
+                            .foregroundColor(Color(hex: "#333333"))
+                        Button(action: { changeMonth(by: 1) }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#d5bca6"))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    HStack(spacing: 0) {
+                        ForEach(dayOfWeek, id: \.self) { day in
+                            Text(day)
+                                .frame(maxWidth: .infinity)
+                                .font(.caption)
+                                .foregroundColor(.gray)
                         }
                     }
                     .padding(.horizontal, 24)
+                    
+                    GeometryReader { geometry in
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
+                            ForEach(daysInMonth, id: \.self) { date in
+                                if let date = date {
+                                    let dateString = dateToString(date)
+                                    let rate = dailyDataForCurrentMonth[dateString] ?? 0.0
+                                    
+                                    NavigationLink(destination: GraphView(currentDate: date)) {
+                                        VStack {
+                                            Text("\(calendar.component(.day, from: date))")
+                                                .font(isToday(date) ? .system(size: 16, weight: .bold) : .system(size: 16))
+                                                .foregroundColor(isToday(date) ? .blue : Color(hex: "#333333"))
+                                                .padding(.top, 4)
+                                                .frame(width: 25)
+                                            Spacer()
+                                        }
+                                        .padding(10)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(getColor(rate: rate))
+                                        )
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                } else {
+                                    Rectangle().fill(Color.clear)
+                                }
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                    }
+                    .frame(maxHeight: .infinity)
+                    
+                    HStack(spacing: 12) {
+                        RoundedRectangle(cornerRadius: 8).fill(Color.green.opacity(0.5)).frame(width: 10, height: 10)
+                        Text("Excellent").font(.caption)
+                        RoundedRectangle(cornerRadius: 8).fill(Color.yellow.opacity(0.5)).frame(width: 10, height: 10)
+                        Text("Good").font(.caption)
+                        RoundedRectangle(cornerRadius: 8).fill(Color.orange.opacity(0.5)).frame(width: 10, height: 10)
+                        Text("Fair").font(.caption)
+                        RoundedRectangle(cornerRadius: 8).fill(Color.red.opacity(0.5)).frame(width: 10, height: 10)
+                        Text("Poor").font(.caption)
+                    }
+                    .padding(.bottom, 30)
                 }
-                .frame(maxHeight: .infinity)
-
-                HStack(spacing: 12) {
-                    RoundedRectangle(cornerRadius: 8).fill(Color.green.opacity(0.5)).frame(width: 10, height: 10)
-                    Text("Excellent").font(.caption)
-                    RoundedRectangle(cornerRadius: 8).fill(Color.yellow.opacity(0.5)).frame(width: 10, height: 10)
-                    Text("Good").font(.caption)
-                    RoundedRectangle(cornerRadius: 8).fill(Color.orange.opacity(0.5)).frame(width: 10, height: 10)
-                    Text("Fair").font(.caption)
-                    RoundedRectangle(cornerRadius: 8).fill(Color.red.opacity(0.5)).frame(width: 10, height: 10)
-                    Text("Poor").font(.caption)
-                }
-                .padding(.bottom, 30)
+                .onAppear { loadAllAchievementRateData() }
+                .onChange(of: selectedMonth) { loadAllAchievementRateData() }
             }
-            .onAppear { loadAllAchievementRateData() }
-            .onChange(of: selectedMonth) { loadAllAchievementRateData() }
         }
     }
 

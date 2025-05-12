@@ -58,9 +58,11 @@ struct MainView: View {
                             }
                         }
 
-                        Text(formattedDate)
-                            .font(.title3)
-                            .foregroundColor(Color(hex: "#333333"))
+                        DatePicker(
+                            "Date",
+                            selection: $currentDate,
+                            displayedComponents: [.date]
+                        ).labelsHidden()
 
                         Button(action: { changeDate(by: 1) }) {
                             ZStack {
