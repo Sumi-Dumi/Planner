@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TaskItem: Identifiable, Codable, Hashable {
+struct TaskItem: Identifiable, Codable, Hashable, Equatable {
     let id: UUID
     var name: String
     var colorHex: String
@@ -17,5 +17,9 @@ struct TaskItem: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, name, colorHex
+    }
+
+    static func == (lhs: TaskItem, rhs: TaskItem) -> Bool {
+        return lhs.id == rhs.id
     }
 }
