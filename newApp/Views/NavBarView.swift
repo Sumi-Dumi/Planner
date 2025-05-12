@@ -34,7 +34,8 @@ struct NavBarView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 28, height: 28)
-                .foregroundColor(selectedTab == tab ? .blue : .gray)
+                .foregroundColor(selectedTab == tab ? .white : Color(hex: "#5c4033"))
+
         }
     }
 }

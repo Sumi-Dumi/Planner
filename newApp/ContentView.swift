@@ -23,6 +23,8 @@ struct ContentView: View {
                     Label("Graph", systemImage: "chart.bar.fill")
                 }
         }
+        .tint(.white) 
+
     }
 }
 
