@@ -151,16 +151,25 @@ struct TaskView: View {
                                 .frame(width: 32, height: 32)
                                 .overlay(Circle().stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 1))
                                 .onTapGesture {
-                                    if let id = colorPickerTaskID,
-                                       let index = tasks.firstIndex(where: { $0.id == id }) {
-                                        tasks[index].colorHex = color.toHex()
-                                        saveTasks()
-                                        colorPickerTaskID = nil
+                                    if let id = colorPickerTaskID {
+                                        if let index = tasks.firstIndex(where: { $0.id == id }) {
+                                            var updatedTask = tasks[index]
+                                            updatedTask.colorHex = color.toHex()
+
+                                            tasks.remove(at: index)
+                                            tasks.insert(updatedTask, at: index)
+
+                                            saveTasks()
+                                            colorPickerTaskID = nil
+                                        }
                                     } else {
                                         selectedColor = color
                                         showHeaderColorPicker = false
                                     }
                                 }
+
+
+
                         }
                     }
                 }
