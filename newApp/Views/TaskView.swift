@@ -3,11 +3,13 @@ import SwiftUI
 struct TaskView: View {
     @State private var newTaskName: String = ""
     @State private var selectedColor: Color = .gray
-    @State private var showColorPicker: Bool = false
+    @State private var showHeaderColorPicker: Bool = false
     @State private var tasks: [TaskItem] = []
     @State private var editingTaskID: UUID? = nil
     @State private var editingName: String = ""
     @State private var colorPickerTaskID: UUID? = nil
+    @State private var colorPickerPosition: CGPoint = .zero
+    @State private var colorPickerWidth: CGFloat = 160
 
     let colorOptions: [Color] = [
         Color(hex: "#f28b82"), Color(hex: "#fbbc04"), Color(hex: "#fff475"),
@@ -16,7 +18,7 @@ struct TaskView: View {
     ]
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Text("Task")
@@ -31,7 +33,8 @@ struct TaskView: View {
                         )
 
                     Button {
-                        showColorPicker.toggle()
+                        showHeaderColorPicker.toggle()
+                        colorPickerTaskID = nil
                     } label: {
                         Circle()
                             .fill(selectedColor)
@@ -54,10 +57,6 @@ struct TaskView: View {
                     }
                 }
 
-                if showColorPicker {
-                    colorGrid(for: $selectedColor)
-                }
-
                 ForEach(tasks) { task in
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
@@ -75,7 +74,6 @@ struct TaskView: View {
 
                             Spacer()
 
-                            // ペンシルアイコンを追加
                             Button {
                                 editingTaskID = task.id
                                 editingName = task.name
@@ -83,13 +81,13 @@ struct TaskView: View {
                                 Image(systemName: "pencil")
                                     .foregroundColor(.blue)
                             }
-                            .padding(.trailing, 8)
 
                             Button {
                                 if colorPickerTaskID == task.id {
                                     colorPickerTaskID = nil
                                 } else {
                                     colorPickerTaskID = task.id
+                                    showHeaderColorPicker = false
                                 }
                             } label: {
                                 Circle()
@@ -104,109 +102,55 @@ struct TaskView: View {
                                 Button("Save") {
                                     saveEditedTask(task.id)
                                 }
-                                .foregroundColor(.blue)
-                                .padding(6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.blue, lineWidth: 1)
-                                )
-
                                 Button("Delete") {
                                     deleteTask(task.id)
                                 }
-                                .foregroundColor(.red)
-                                .padding(6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.red, lineWidth: 1)
-                                )
-
                                 Button("Cancel") {
                                     editingTaskID = nil
                                 }
-                                .foregroundColor(.gray)
-                                .padding(6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.gray, lineWidth: 1)
-                                )
                             }
-                            .padding(.top, 4)
                         }
                     }
-                    .padding(.vertical, 4)
-                    .padding(.horizontal, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.gray.opacity(0.05))
-                    )
                 }
 
                 Spacer()
             }
             .padding()
 
-            if let taskID = colorPickerTaskID {
-                VStack {
-                    Spacer()
-                    colorGrid(for: Binding(
-                        get: {
-                            tasks.first(where: { $0.id == taskID })?.color ?? .gray
-                        },
-                        set: { newColor in
-                            if let index = tasks.firstIndex(where: { $0.id == taskID }) {
-                                tasks[index].colorHex = newColor.toHex()
-                                saveTasks()
-                            }
+            if showHeaderColorPicker || colorPickerTaskID != nil {
+                VStack(spacing: 12) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 12), count: 5), spacing: 12) {
+                        ForEach(colorOptions, id: \.self) { color in
+                            Circle()
+                                .fill(color)
+                                .frame(width: 32, height: 32)
+                                .overlay(Circle().stroke(Color.black.opacity(0.5), lineWidth: 1))
+                                .onTapGesture {
+                                    if let id = colorPickerTaskID,
+                                       let index = tasks.firstIndex(where: { $0.id == id }) {
+                                        tasks[index].colorHex = color.toHex()
+                                        saveTasks()
+                                        colorPickerTaskID = nil
+                                    } else {
+                                        selectedColor = color
+                                        showHeaderColorPicker = false
+                                    }
+                                }
                         }
-                    ))
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(12)
-                    .shadow(radius: 4)
-                    .padding()
-
-                    Button("完了") {
-                        colorPickerTaskID = nil
                     }
-                    .foregroundColor(.blue)
-                    .padding(8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.blue.opacity(0.1))
-                    )
-                    .padding(.bottom)
                 }
+                .padding(12)
+                .background(Color.white)
+                .cornerRadius(10)
+                .shadow(radius: 4)
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height - 150)
             }
         }
         .onTapGesture {
-            // タップ時はカラーピッカーだけ閉じる（編集モードは維持）
-            if colorPickerTaskID != nil {
-                colorPickerTaskID = nil
-            }
+            if showHeaderColorPicker { showHeaderColorPicker = false }
+            if colorPickerTaskID != nil { colorPickerTaskID = nil }
         }
         .onAppear(perform: loadTasks)
-    }
-
-    private func colorGrid(for colorBinding: Binding<Color>) -> some View {
-        VStack(spacing: 8) {
-            Text("色を選択")
-                .font(.headline)
-                .padding(.top, 4)
-
-            LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 12), count: 5), spacing: 12) {
-                ForEach(colorOptions, id: \.self) { color in
-                    Circle()
-                        .fill(color)
-                        .frame(width: 32, height: 32)
-                        .overlay(Circle().stroke(Color.black.opacity(colorBinding.wrappedValue == color ? 1 : 0), lineWidth: 2))
-                        .onTapGesture {
-                            colorBinding.wrappedValue = color
-                            showColorPicker = false
-                        }
-                }
-            }
-        }
     }
 
     private func saveTasks() {
