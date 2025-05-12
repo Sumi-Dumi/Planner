@@ -8,8 +8,6 @@ struct TaskView: View {
     @State private var editingTaskID: UUID? = nil
     @State private var editingName: String = ""
     @State private var colorPickerTaskID: UUID? = nil
-    @State private var colorPickerPosition: CGPoint = .zero
-    @State private var colorPickerWidth: CGFloat = 160
 
     let colorOptions: [Color] = [
         Color(hex: "#f28b82"), Color(hex: "#fbbc04"), Color(hex: "#fff475"),
@@ -18,18 +16,31 @@ struct TaskView: View {
     ]
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
+        ZStack {
+            Color(hex: "#b99a88")
+                .edgesIgnoringSafeArea(.all)
+
+            VStack {
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.white)
+            .cornerRadius(20)
+            .padding(.top, 10)
+            .padding(.bottom, 5)
+            .padding(.horizontal, 15)
+
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
                     Text("Task")
                         .font(.title2)
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color(hex: "b99a88"))
 
-                    TextField("Enter task name", text: $newTaskName)
+                    TextField("   Enter task name", text: $newTaskName)
                         .padding(6)
                         .background(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 2)
                         )
 
                     Button {
@@ -39,7 +50,7 @@ struct TaskView: View {
                         Circle()
                             .fill(selectedColor)
                             .frame(width: 32, height: 32)
-                            .overlay(Circle().stroke(Color.black, lineWidth: 1))
+                            .overlay(Circle().stroke(Color(hex: "#333333"), lineWidth: 1))
                     }
 
                     Button {
@@ -51,9 +62,9 @@ struct TaskView: View {
                         }
                     } label: {
                         Circle()
-                            .stroke(Color.black, lineWidth: 1)
+                            .stroke(Color(hex: "#333333"), lineWidth: 1)
                             .frame(width: 32, height: 32)
-                            .overlay(Image(systemName: "plus").foregroundColor(.blue))
+                            .overlay(Image(systemName: "plus").foregroundColor(Color(hex: "#333333")))
                     }
                 }
 
@@ -69,18 +80,10 @@ struct TaskView: View {
                             } else {
                                 Text(task.name)
                                     .font(.title3)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color(hex: "#333333"))
                             }
 
                             Spacer()
-
-                            Button {
-                                editingTaskID = task.id
-                                editingName = task.name
-                            } label: {
-                                Image(systemName: "pencil")
-                                    .foregroundColor(.blue)
-                            }
 
                             Button {
                                 if colorPickerTaskID == task.id {
@@ -93,20 +96,41 @@ struct TaskView: View {
                                 Circle()
                                     .fill(task.color)
                                     .frame(width: 32, height: 32)
-                                    .overlay(Circle().stroke(Color.black, lineWidth: 1))
+                                    .overlay(Circle().stroke(Color(hex: "#333333"), lineWidth: 1))
+                            }
+
+                            if editingTaskID != task.id {
+                                Button {
+                                    editingTaskID = task.id
+                                    editingName = task.name
+                                } label: {
+                                    Image(systemName: "pencil")
+                                        .foregroundColor(Color(hex: "#333333"))
+                                }
                             }
                         }
 
                         if editingTaskID == task.id {
-                            HStack {
-                                Button("Save") {
+                            HStack(spacing: 16) {
+                                Button {
                                     saveEditedTask(task.id)
+                                } label: {
+                                    Image(systemName: "square.and.arrow.down")
+                                        .foregroundColor(.blue)
                                 }
-                                Button("Delete") {
+
+                                Button {
                                     deleteTask(task.id)
+                                } label: {
+                                    Image(systemName: "trash")
+                                        .foregroundColor(.red)
                                 }
-                                Button("Cancel") {
+
+                                Button {
                                     editingTaskID = nil
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .foregroundColor(.gray)
                                 }
                             }
                         }
@@ -115,16 +139,17 @@ struct TaskView: View {
 
                 Spacer()
             }
-            .padding()
+            .padding(.top, 40)
+            .padding(.horizontal, 40)
 
             if showHeaderColorPicker || colorPickerTaskID != nil {
                 VStack(spacing: 12) {
-                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 12), count: 5), spacing: 12) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.fixed(32), spacing: 8), count: 5), spacing: 8) {
                         ForEach(colorOptions, id: \.self) { color in
                             Circle()
                                 .fill(color)
                                 .frame(width: 32, height: 32)
-                                .overlay(Circle().stroke(Color.black.opacity(0.5), lineWidth: 1))
+                                .overlay(Circle().stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 1))
                                 .onTapGesture {
                                     if let id = colorPickerTaskID,
                                        let index = tasks.firstIndex(where: { $0.id == id }) {
@@ -143,7 +168,8 @@ struct TaskView: View {
                 .background(Color.white)
                 .cornerRadius(10)
                 .shadow(radius: 4)
-                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height - 150)
+                .frame(width: 300)
+                .position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height - 200)
             }
         }
         .onTapGesture {
