@@ -62,7 +62,9 @@ struct MainView: View {
                             "Date",
                             selection: $currentDate,
                             displayedComponents: [.date]
-                        ).labelsHidden()
+                        )
+                        .labelsHidden()
+                        .tint(.black)
 
                         Button(action: { changeDate(by: 1) }) {
                             ZStack {
