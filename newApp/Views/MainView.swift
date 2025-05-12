@@ -6,69 +6,107 @@ struct MainView: View {
     @State private var tasks: [TaskItem] = []
     @State private var isDropdownExpanded: Bool = false
     @State private var dropdownFrame: CGRect = .zero
-
     @State private var showPlan: Bool = true
     @State private var showAchieve: Bool = true
-    
     @State private var showErrorPopup = false
-    
     @State private var navigationPath: [String] = []
-    
 
     let hours = (4..<24).map { "\($0)" } + (0..<4).map { "\($0)" }
     let hourLabelWidth: CGFloat = 40
-    let cellWidth: CGFloat = 56
-    let cellHeight: CGFloat = 28
+    let cellWidth: CGFloat = 50
+    let cellHeight: CGFloat = 25
+    var brown: Color {
+        Color(hex: "#d5bca6")
+    }
+
+    var darkBrown: Color {
+        Color(hex: "#a07e60")
+    }
+
+    var lightBrown: Color {
+        brown.opacity(0.08)
+    }
+    let dustyPink = Color(hex: "#e3b7b7")
+
+
 
     var body: some View {
         NavigationStack(path: $navigationPath) {
-            ZStack(alignment: .topLeading) {
-                VStack(spacing: 12) {
-                    HStack {
-                        Button(action: { changeDate(by: -1) }) {
-                            Image(systemName: "chevron.left").font(.title2)
-                        }
-                        Spacer()
-                        DatePicker(
-                            "Date",
-                            selection: $currentDate,
-                            displayedComponents: [.date]
-                        ).labelsHidden()
-                        Spacer()
-                        Button(action: { changeDate(by: 1) }) {
-                            Image(systemName: "chevron.right").font(.title2)
-                        }
-                    }
-                    .padding(.horizontal)
+            ZStack {
+                Color(hex: "#b99a88").edgesIgnoringSafeArea(.all)
 
-                    Button(action: {
-                        isDropdownExpanded.toggle()
-                    }) {
-                        HStack {
-                            Text(selectedTask?.name ?? "All Tasks")
-                                .foregroundColor(.blue)
-                            Spacer()
-                            Image(systemName: isDropdownExpanded ? "chevron.up" : "chevron.down")
-                                .foregroundColor(.black)
+                VStack {
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.white)
+                .cornerRadius(20)
+                .padding(.top, 10)
+                .padding(.bottom, 10)
+                .padding(.horizontal, 10)
+
+                VStack(spacing: 12) {
+                    HStack(spacing: 16) {
+                        Spacer()
+                        Button(action: { changeDate(by: -1) }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#d5bca6"))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: "chevron.left")
+                                    .foregroundColor(.white)
+                            }
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
-                        )
+
+                        Text(formattedDate)
+                            .font(.title3)
+                            .foregroundColor(Color(hex: "#333333"))
+
+                        Button(action: { changeDate(by: 1) }) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(hex: "#d5bca6"))
+                                    .frame(width: 32, height: 32)
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        Spacer()
                     }
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear
-                                .onAppear {
-                                    dropdownFrame = geo.frame(in: .global)
+                    .padding(.top, 30)
+                    .padding(.horizontal, 8)
+
+                    HStack {
+                        Button(action: {
+                            isDropdownExpanded.toggle()
+                        }) {
+                            HStack {
+                                Text(selectedTask?.name ?? "All Tasks")
+                                    .foregroundColor(Color(hex: "#333333"))
+                                Spacer()
+                                Image(systemName: isDropdownExpanded ? "chevron.up" : "chevron.down")
+                                    .foregroundColor(.black)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear
+                                        .onAppear {
+                                            dropdownFrame = geo.frame(in: .global)
+                                        }
+                                        .onChange(of: isDropdownExpanded) {
+                                            dropdownFrame = geo.frame(in: .global)
+                                        }
                                 }
-                                .onChange(of: isDropdownExpanded) {
-                                    dropdownFrame = geo.frame(in: .global)
-                                }
+                            )
+                            .frame(width: 296)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 2)
+                            )
                         }
-                    )
+                    }
                     .padding(.horizontal)
 
                     ScrollView {
@@ -113,51 +151,70 @@ struct MainView: View {
                                     }
                                 }
                             }
-
                         }
                     }
 
-                    HStack(spacing: 40) {
-                        ToggleCircle(label: "Planned", isOn: $showPlan)
-                        ToggleCircle(label: "Achieved", isOn: $showAchieve)
-                    }
-                    .padding(.top)
-                    
-                    
-                        Button {
-                            if tasks.isEmpty {
-                                showErrorPopup = true
-                            } else {
-                                navigationPath.append("timeGridView")
-                            }
-                            
-                        } label: {
-                            Text("Plan")
-                                .font(.title2)
+                    HStack(spacing: 17) {
+                        Button(action: { showPlan.toggle() }) {
+                            Text("PLANNED")
+                                .fontWeight(.bold)
                                 .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(10)
+                                .frame(height: 28)
+                                .foregroundColor(showPlan ? .white : darkBrown)
+                                .background(showPlan ? dustyPink : lightBrown)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(darkBrown, lineWidth: 2)
+                                )
+                                .cornerRadius(15)
                         }
-                        .font(.title2)
-                        .padding()
-                        .alert(isPresented: $showErrorPopup) {
-                            Alert(
-                                title: Text("No Task Available"),
-                                message: Text("Please create a task first."),
-                                dismissButton: .default(Text("OK"))
-                            )
+
+                        Button(action: { showAchieve.toggle() }) {
+                            Text("ACHIEVED")
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 28)
+                                .foregroundColor(showAchieve ? .white : darkBrown)
+                                .background(showAchieve ? dustyPink : lightBrown)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(darkBrown, lineWidth: 2)
+                                )
+                                .cornerRadius(15)
                         }
-                            
-//                    NavigationLink(destination: TimeGridView(currentDate: $currentDate)) {
-//                        Text("Plan")
-//                            .font(.title2)
-//                            .frame(maxWidth: .infinity)
-//                            .padding()
-//                            .background(Color.blue.opacity(0.1))
-//                            .cornerRadius(10)
-//                    }
-//                    .padding()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 20)
+
+
+
+
+
+
+                    Button {
+                        if tasks.isEmpty {
+                            showErrorPopup = true
+                        } else {
+                            navigationPath.append("timeGridView")
+                        }
+                    } label: {
+                        Text("PLAN")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: 150)
+                            .padding(7)
+                            .background(Color(hex: "#5c4033"))
+                            .cornerRadius(15)
+                            .foregroundColor(.white)
+                    }
+                    .padding(.bottom, 23)
+                    .alert(isPresented: $showErrorPopup) {
+                        Alert(
+                            title: Text("No Task Available"),
+                            message: Text("Please create a task first."),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }
+
                 }
 
                 if isDropdownExpanded {
@@ -167,7 +224,7 @@ struct MainView: View {
                             isDropdownExpanded = false
                         }) {
                             HStack {
-                                Text("All Tasks").foregroundColor(.blue)
+                                Text("All Tasks").foregroundColor(Color(hex: "#333333"))
                                 Spacer()
                                 Image(systemName: "circle.grid.cross")
                                     .foregroundColor(.gray)
@@ -182,7 +239,7 @@ struct MainView: View {
                                 isDropdownExpanded = false
                             }) {
                                 HStack {
-                                    Text(task.name).foregroundColor(.blue)
+                                    Text(task.name).foregroundColor(Color(hex: "#333333"))
                                     Spacer()
                                     Circle()
                                         .fill(task.color)
@@ -211,7 +268,12 @@ struct MainView: View {
                 }
             }
         }
+    }
 
+    func changeDate(by days: Int) {
+        if let newDate = Calendar.current.date(byAdding: .day, value: days, to: currentDate) {
+            currentDate = newDate
+        }
     }
 
     var formattedDate: String {
@@ -224,12 +286,6 @@ struct MainView: View {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: currentDate)
-    }
-
-    func changeDate(by days: Int) {
-        if let newDate = Calendar.current.date(byAdding: .day, value: days, to: currentDate) {
-            currentDate = newDate
-        }
     }
 
     func loadTasks() {
@@ -266,7 +322,6 @@ struct MainView: View {
                 let totalMinutes = (components.hour ?? 0) * 60 + (components.minute ?? 0)
                 let hourIndex = (totalMinutes / 60 + 20) % 24
                 let col = (totalMinutes % 60) / 10
-
                 let coord = CellCoord(row: hourIndex, col: col)
                 result[coord] = task
 
@@ -302,6 +357,25 @@ struct MainView: View {
         return spans
     }
 }
+
+struct ToggleTag: View {
+    let label: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Text(label)
+            .font(.system(size: 14, weight: .medium))
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(isOn ? Color(hex: "#d5bca6") : Color.gray.opacity(0.2))
+            .cornerRadius(20)
+            .foregroundColor(Color(hex: "#333333"))
+            .onTapGesture {
+                isOn.toggle()
+            }
+    }
+}
+
 
 #Preview {
     MainView()
