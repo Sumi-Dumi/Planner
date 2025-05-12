@@ -17,8 +17,8 @@ struct TimeGridView: View {
     @State private var dropdownWidth: CGFloat = 0
 
     let hours = (4..<24).map { "\($0)" } + (0..<4).map { "\($0)" }
-    let cellWidth: CGFloat = 56
-    let cellHeight: CGFloat = 28
+    let cellWidth: CGFloat = 48
+    let cellHeight: CGFloat = 25
     let hourLabelWidth: CGFloat = 40
 
     init(currentDate: Binding<Date>) {
@@ -27,37 +27,85 @@ struct TimeGridView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            VStack(spacing: 12) {
+        ZStack {
+            Color(hex: "#b99a88")
+                .edgesIgnoringSafeArea(.all)
+
+            VStack {
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.white)
+            .cornerRadius(20)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
+            .padding(.horizontal, 10)
+
+            contentLayer
+
+            VStack {
                 HStack {
                     Button(action: {
                         currentDate = Date()
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .foregroundColor(.red)
+                            .foregroundColor(Color.gray.opacity(0.5))
                             .font(.title2)
+                            .padding(.leading, 30)
+                            .padding(.top, 30)
                     }
+                    Spacer()
+                }
+                Spacer()
+            }
 
+        }
+        .onAppear {
+            loadTasks()
+            loadSavedData(for: editingDate)
+        }
+        .onChange(of: editingDate) {
+            loadSavedData(for: editingDate)
+        }
+        .navigationBarBackButtonHidden(true)
+    }
+
+    var contentLayer: some View {
+        ZStack(alignment: .topLeading) {
+            VStack(spacing: 12) {
+                // 가운데 정렬된 날짜 + < > 버튼 UI
+                HStack(spacing: 16) {
                     Spacer()
 
                     Button(action: { changeDate(by: -1) }) {
-                        Image(systemName: "chevron.left").font(.title2)
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "#d5bca6"))
+                                .frame(width: 32, height: 32)
+                            Image(systemName: "chevron.left")
+                                .foregroundColor(.white)
+                        }
                     }
 
-                    Spacer()
                     Text(formattedDate)
                         .font(.title3)
-                        .foregroundColor(.blue)
-                    Spacer()
+                        .foregroundColor(Color(hex: "#333333"))
 
                     Button(action: { changeDate(by: 1) }) {
-                        Image(systemName: "chevron.right").font(.title2)
+                        ZStack {
+                            Circle()
+                                .fill(Color(hex: "#d5bca6"))
+                                .frame(width: 32, height: 32)
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.white)
+                        }
                     }
 
                     Spacer()
                 }
-                .padding(.horizontal)
+                .padding(.top, 30)
+                .padding(.horizontal, 8)
 
                 HStack {
                     Button(action: {
@@ -67,7 +115,7 @@ struct TimeGridView: View {
                     }) {
                         HStack {
                             Text(selectedTask?.name ?? "Select Task")
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color(hex: "#333333"))
                             Spacer()
                             if let task = selectedTask {
                                 Circle()
@@ -95,13 +143,12 @@ struct TimeGridView: View {
                                             dropdownWidth = geo.size.width
                                         }
                                     }
-
                             }
                         )
                         .frame(width: 296)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+                                .stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 2)
                         )
                     }
                 }
@@ -140,6 +187,7 @@ struct TimeGridView: View {
                                 }
                             }
                         }
+                        .padding(.horizontal, 20)
                         .background(
                             DragDetector(
                                 cellWidth: cellWidth,
@@ -154,16 +202,19 @@ struct TimeGridView: View {
                     }
                 }
                 .frame(maxHeight: .infinity)
+                .padding(.bottom, 0)
 
                 Button("Save") {
                     saveCurrentGrid()
                 }
-                .padding(2)
+                .padding(7)
                 .frame(maxWidth: 150)
-                .background(Color.blue.opacity(0.2))
+                .background(Color(hex: "#d5bca6"))
                 .cornerRadius(10)
+                .foregroundColor(Color(hex: "#333333"))
             }
             .padding(.horizontal)
+            .padding(.bottom, 18)
 
             if isDropdownExpanded {
                 VStack(spacing: 8) {
@@ -173,7 +224,7 @@ struct TimeGridView: View {
                             isDropdownExpanded = false
                         }) {
                             HStack {
-                                Text(task.name).foregroundColor(.blue)
+                                Text(task.name).foregroundColor(Color(hex: "#333333"))
                                 Spacer()
                                 Circle()
                                     .fill(task.color)
@@ -195,14 +246,6 @@ struct TimeGridView: View {
                 )
             }
         }
-        .onAppear {
-            loadTasks()
-            loadSavedData(for: editingDate)
-        }
-        .onChange(of: editingDate) {
-            loadSavedData(for: editingDate)
-        }
-        .navigationBarBackButtonHidden(true)
     }
 
     var formattedDate: String {
