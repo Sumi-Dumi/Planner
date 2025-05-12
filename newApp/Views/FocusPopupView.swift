@@ -13,14 +13,15 @@ struct FocusPopupView: View {
             StarRatingView(rating: $rating)
                 .frame(height: 40)
 
-            Button("Rate") {
+            Button("RATE") {
                 onRate()
             }
-            .font(.headline)
+            .font(.headline.bold())
             .padding(.vertical, 10)
             .padding(.horizontal, 40)
-            .background(Color.blue.opacity(0.2))
+            .background(Color(hex: "#7b5e57")) 
             .cornerRadius(10)
+            .foregroundColor(.white)
 
             Spacer().frame(height: 12)
         }
