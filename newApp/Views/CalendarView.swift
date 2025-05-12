@@ -8,8 +8,6 @@ struct CalendarView: View {
     private let dayOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     
     var body: some View {
-        NavigationStack{
-            ZStack {
         NavigationStack {
             ZStack {
                 Color(hex: "#b99a88").edgesIgnoringSafeArea(.all)
@@ -29,6 +27,7 @@ struct CalendarView: View {
                     
                     HStack(spacing: 16) {
                         Spacer()
+                        
                         Button(action: { changeMonth(by: -1) }) {
                             ZStack {
                                 Circle()
@@ -38,9 +37,6 @@ struct CalendarView: View {
                                     .foregroundColor(.white)
                             }
                         }
-                        Text(formattedMonth)
-                            .font(.title3)
-                            .foregroundColor(Color(hex: "#333333"))
                         
                         Text(formattedMonth)
                             .font(.title3)
@@ -55,7 +51,7 @@ struct CalendarView: View {
                                     .foregroundColor(.white)
                             }
                         }
-
+                        
                         Spacer()
                     }
                     .padding(.horizontal, 24)
@@ -69,7 +65,7 @@ struct CalendarView: View {
                         }
                     }
                     .padding(.horizontal, 24)
-                    GeometryReader { geometry in
+                    
                     GeometryReader { _ in
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 10) {
                             ForEach(daysInMonth, id: \.self) { date in
@@ -81,10 +77,6 @@ struct CalendarView: View {
                                         VStack {
                                             Text("\(calendar.component(.day, from: date))")
                                                 .font(isToday(date) ? .system(size: 16, weight: .bold) : .system(size: 16))
-
-                                                .foregroundColor(isToday(date) ? .blue : Color(hex: "#333333"))
-                                                .padding(.top, 4)
-                                                .frame(width: 25)
                                                 .foregroundColor(isToday(date) ? .white : Color(hex: "#333333"))
                                                 .padding(.top, 4)
                                                 .frame(width: 25)
