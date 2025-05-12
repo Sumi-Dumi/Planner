@@ -204,14 +204,16 @@ struct TimeGridView: View {
                 .frame(maxHeight: .infinity)
                 .padding(.bottom, 0)
 
-                Button("Save") {
+                Button("SAVE") {
                     saveCurrentGrid()
                 }
+                .font(.headline.bold())
                 .padding(7)
                 .frame(maxWidth: 150)
-                .background(Color(hex: "#d5bca6"))
-                .cornerRadius(10)
-                .foregroundColor(Color(hex: "#333333"))
+                .background(Color(hex: "#7b5e57"))
+                .cornerRadius(20)
+                .foregroundColor(.white)
+
             }
             .padding(.horizontal)
             .padding(.bottom, 18)

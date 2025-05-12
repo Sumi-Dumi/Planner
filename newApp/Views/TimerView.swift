@@ -21,19 +21,31 @@ struct TimerView: View {
     @State private var showFocusPopup = false
     @State private var lastSessionID: UUID?
     @State private var focusRating: Int = 0
-    
-    @State private var showErrorPopup = false
 
+    @State private var showErrorPopup = false
 
     var body: some View {
         ZStack {
+            Color(hex: "#b99a88")
+                .edgesIgnoringSafeArea(.all)
+
+            VStack {
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.white)
+            .cornerRadius(20)
+            .padding(.top, 10)
+            .padding(.bottom, 10)
+            .padding(.horizontal, 10)
+
             VStack(spacing: 20) {
                 Button(action: {
                     isDropdownExpanded.toggle()
                 }) {
                     HStack {
                         Text(selectedTask?.name ?? "Select Task")
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color(hex: "#333333"))
                         Spacer()
                         if let task = selectedTask {
                             Circle()
@@ -48,7 +60,7 @@ struct TimerView: View {
                     .padding(.vertical, 8)
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue.opacity(0.5), lineWidth: 2)
+                            .stroke(Color(hex: "#333333").opacity(0.5), lineWidth: 2)
                     )
                 }
                 .background(
@@ -89,39 +101,65 @@ struct TimerView: View {
                             startTimer()
                             onPause = false
                         } label: {
-                            if !onPause {
-                                Text("Start")
-                            } else {
-                                Text("Continue")
-                            }
-                            
+                            Text(onPause ? "CONTINUE" : "START")
+                                .font(.title2.bold())
+                                .foregroundColor(.white)
+                                .frame(width: 120, height: 44)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hex: onPause ? "#d8a39d" : "#7b5e57"))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color(hex: "#7b5e57"), lineWidth: 2)
+                                )
                         }
-                        .font(.title2)
                         .alert(isPresented: $showErrorPopup) {
-                        Alert(
-                            title: Text("No Task Selected"),
-                            message: Text("Please select a task before starting the timer."),
-                            dismissButton: .default(Text("OK"))
-                        )
-                    }
+                            Alert(
+                                title: Text("No Task Selected"),
+                                message: Text("Please select a task before starting the timer."),
+                                dismissButton: .default(Text("OK"))
+                            )
+                        }
                     } else {
-                        Button("Pause") {
+                        Button("PAUSE") {
                             pauseTimer()
                             onPause = true
                         }
-                        .font(.title2)
+                        .font(.title2.bold())
+                        .foregroundColor(.white)
+                        .frame(width: 120, height: 44)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(hex: "#a8b3a1"))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color(hex: "#7b5e57"), lineWidth: 2)
+                        )
 
-                        Button("Stop") {
+                        Button("STOP") {
                             stopTimer()
                             onPause = false
                         }
-                        .font(.title2)
+                        .font(.title2.bold())
+                        .foregroundColor(.white)
+                        .frame(width: 120, height: 44)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(hex: "#b47c7c"))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color(hex: "#7b5e57"), lineWidth: 2)
+                        )
                     }
                 }
 
                 Spacer()
             }
             .padding()
+            .padding(.top, 30)
             .onAppear(perform: loadTasks)
 
             if isDropdownExpanded {
@@ -132,7 +170,7 @@ struct TimerView: View {
                             isDropdownExpanded = false
                         }) {
                             HStack {
-                                Text(task.name).foregroundColor(.blue)
+                                Text(task.name).foregroundColor(Color(hex: "#333333"))
                                 Spacer()
                                 Circle()
                                     .fill(task.color)
@@ -163,8 +201,6 @@ struct TimerView: View {
                 .cornerRadius(16)
                 .shadow(radius: 6)
             }
-            
-
         }
     }
 
@@ -173,15 +209,12 @@ struct TimerView: View {
             showErrorPopup = true
             return
         }
-
         if timeRemaining == 0 {
             totalTime = (hours * 60 + minutes) * 60
             timeRemaining = totalTime
         }
-
         sessionStartTime = Date()
         timerRunning = true
-
         timer = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { _ in
@@ -245,7 +278,6 @@ struct TimerView: View {
             UserDefaults.standard.set(encoded, forKey: "SavedTimerSessions")
         }
 
-        print("Saved: \(task.name) from \(start) to \(end)")
         return sessionID
     }
 
@@ -266,8 +298,6 @@ struct TimerView: View {
         if let encoded = try? JSONEncoder().encode(saved) {
             UserDefaults.standard.set(encoded, forKey: "SavedTimerSessions")
         }
-
-        print("Focus rating \(focusRating)/10 saved for session \(id)")
     }
 
     func loadTasks() {
